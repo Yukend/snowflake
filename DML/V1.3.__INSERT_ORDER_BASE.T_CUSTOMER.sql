@@ -6,55 +6,33 @@ INSERT INTO YUKENDHIRAN.ORDER_BASE.T_CUSTOMER (
   STATUS, 
   CREATE_DATE, 
   CREATE_USER
-) 
-VALUES 
-  (
-    'CUST001', '123, ABC Street, XYZ City', 
-    '1234567890', 'GOLD', 'ACTIVE', 
-    '2024-04-25', 'John Doe'
-  ), 
-  (
-    'CUST002', '456, DEF Street, XYZ City', 
-    '2345678901', 'SILVER', 'ACTIVE', 
-    '2024-04-26', 'Jane Smith'
-  ), 
-  (
-    'CUST003', '789, GHI Street, XYZ City', 
-    '3456789012', 'BRONZE', 'ACTIVE', 
-    '2024-04-27', 'Michael Lee'
-  ), 
-  (
-    'CUST004', '012, JKL Street, XYZ City', 
-    '4567890123', 'REGULAR', 'ACTIVE', 
-    '2024-04-28', 'Alice Johnson'
-  ), 
-  (
-    'CUST005', '345, MNO Street, XYZ City', 
-    '5678901234', 'REGULAR', 'ACTIVE', 
-    '2024-04-29', 'David Williams'
-  ), 
-  (
-    'CUST006', '346, MNO Street, XYZ City', 
-    '5678901235', 'REGULAR', 'ACTIVE', 
-    '2024-04-30', 'David Willy'
-  ),
-  (
-    'CUST007', '347, MNO Street, XYZ City', 
-    '5678901236', 'RARE', 'ACTIVE', 
-    '2024-04-01', 'David William'
-  ),
-  (
-    'CUST008', '348, MNO Street, XYZ City', 
-    '5678901237', 'RARE', 'INACTIVE', 
-    '2024-04-01', 'David Will'
-  ),
-  (
-    'CUST009', '349, MNO Street, XYZ City', 
-    '5678901238', 'RARE', 'INACTIVE', 
-    '2024-04-02', 'David Wil'
-  ),
-  (
-    'CUST010', '350, MNO Street, XYZ City', 
-    '5678901239', 'RARE', 'INACTIVE', 
-    '2024-04-03', 'David Wi'
-  );
+)
+SELECT 
+  'CUST' || LPAD(ROW_NUMBER() OVER (ORDER BY SEQ4()), 4, '0') AS CUSTOMER_ID,
+  'Address ' || SEQ4() AS ADDRESS,
+  '555-01' || LPAD(SEQ4() % 10000, 4, '0') AS PHONE_NO,
+  CASE 
+    WHEN SEQ4() % 5 = 0 THEN 'GOLD'
+    WHEN SEQ4() % 5 = 1 THEN 'SILVER'
+    WHEN SEQ4() % 5 = 2 THEN 'BRONZE'
+    WHEN SEQ4() % 5 = 3 THEN 'REGULAR'
+    ELSE 'NEW'
+  END AS CATEGORY,
+  CASE 
+    WHEN SEQ4() % 2 = 0 THEN 'ACTIVE'
+    ELSE 'INACTIVE'
+  END AS STATUS,
+  DATEADD(DAY, -((SEQ4() % 120) + 30), CURRENT_DATE) AS CREATE_DATE,
+  CASE 
+    WHEN SEQ4() % 10 = 0 THEN 'USER_A'
+    WHEN SEQ4() % 10 = 1 THEN 'USER_B'
+    WHEN SEQ4() % 10 = 2 THEN 'USER_C'
+    WHEN SEQ4() % 10 = 3 THEN 'USER_D'
+    WHEN SEQ4() % 10 = 4 THEN 'USER_E'
+    WHEN SEQ4() % 10 = 5 THEN 'USER_F'
+    WHEN SEQ4() % 10 = 6 THEN 'USER_G'
+    WHEN SEQ4() % 10 = 7 THEN 'USER_H'
+    WHEN SEQ4() % 10 = 8 THEN 'USER_I'
+    ELSE 'USER_J'
+  END AS CREATE_USER
+FROM TABLE(GENERATOR(ROWCOUNT => 100));
