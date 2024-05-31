@@ -10,8 +10,8 @@ INSERT INTO YUKENDHIRAN.ORDER_BASE.T_CUSTOMER (
 VALUES 
   (
     'CUST001', '123, ABC Street, XYZ City', 
-    '1234567890', 'GOLD', 'ACTIVE', '2024-04-25', 
-    'John Doe'
+    '1234567890', 'GOLD', 'ACTIVE', 
+    '2024-04-25', 'John Doe'
   ), 
   (
     'CUST002', '456, DEF Street, XYZ City', 
