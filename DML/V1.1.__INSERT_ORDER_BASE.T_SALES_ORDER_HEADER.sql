@@ -18,8 +18,7 @@ WITH CustomerOrders AS (
   FROM 
     YUKENDHIRAN.ORDER_BASE.T_CUSTOMER cu
   WHERE 
-    CREATE_DATE < DATEADD(MONTH, -1, CURRENT_DATE) -- Ensure customers created before the current month
-    AND CREATE_DATE >= DATEADD(MONTH, -5, CURRENT_DATE) -- Ensure customers created within the last 5 months
+    cu.STATUS = 'ACTIVE' -- Only generate orders for active customers
   QUALIFY 
     ROW_NUMBER() OVER (PARTITION BY cu.CUSTOMER_ID ORDER BY cu.CREATE_DATE) <= 1
 ),
@@ -39,7 +38,7 @@ OrderGenerator AS (
 )
 SELECT 
   'ORD' || LPAD(ROW_NUMBER() OVER (ORDER BY CUSTOMER_ID, ORDER_SEQ), 4, '0') AS ORDER_ID,
-  DATEADD(DAY, ORDER_SEQ, CREATE_DATE) AS ORDER_DATE, -- Ensure each order date is sequential
+  DATEADD(DAY, ORDER_SEQ, CURRENT_DATE()) AS ORDER_DATE, -- Ensure each order date is greater than today's date
   CASE 
     WHEN STATUS = 'INACTIVE' THEN 'CLOSED'
     ELSE 'OPEN'
@@ -49,10 +48,9 @@ SELECT
     WHEN CATEGORY = 'REGULAR' THEN 'COUPON_' || CHR(88 + (SEQ % 3)) -- Generates 'COUPON_X', 'COUPON_Y', 'COUPON_Z'
     ELSE NULL
   END AS COUPON,
-  DATEADD(DAY, ORDER_SEQ, CREATE_DATE) AS CREATE_DATE, -- Same as ORDER_DATE
+  DATEADD(DAY, ORDER_SEQ, CURRENT_DATE()) AS CREATE_DATE, -- Same as ORDER_DATE
   CREATE_USER
 FROM 
   OrderGenerator
 WHERE 
   ORDER_SEQ <= NUM_ORDERS; -- Limit orders to the specified number per customer
-
