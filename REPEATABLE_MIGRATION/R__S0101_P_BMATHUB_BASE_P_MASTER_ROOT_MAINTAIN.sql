@@ -1,46 +1,21 @@
--- CREATE OR REPLACE PROCEDURE MASTER_ROOT_MAINTAIN()
--- RETURNS STRING
--- LANGUAGE SQL
--- AS
--- $$
--- BEGIN
---     COPY INTO Y_SIM_BOM.MASTER_DATA.ITEM (ITEM_ID, ITEM_CLASS_NM, ITEM_DSC, DELETE_IND)
--- FROM @~/Documents/snowflake/item.csv
--- FILE_FORMAT = (TYPE = CSV, SKIP_HEADER = 1);
---     COPY INTO Y_SIM_BOM.MASTER_DATA.LOCATION (ITEM_ID, ITEM_CLASS_NM, LOCATION_ID)
--- FROM @~/Documents/snowflake/location.csv
--- FILE_FORMAT = (TYPE = CSV, SKIP_HEADER = 1);
---     COPY INTO Y_SIM_BOM.MASTER_DATA.ORIG_BOM (INPUT_ITEM_ID, ITEM_CLASS_NM, OUTPUT_ITEM_ID, LOC)
--- FROM @~/Documents/snowflake/orig_bom.csv
--- FILE_FORMAT = (TYPE = CSV, SKIP_HEADER = 1);
---     RETURN 'Data loaded successfully.';
--- END;
--- $$;
--- CREATE OR REPLACE PROCEDURE MASTER_ROOT_MAINTAIN()
--- RETURNS STRING
--- LANGUAGE SQL
--- AS
--- $$VARCHARVARCHAR
-
--- BEGIN
---     COPY INTO Y_SIM_BOM.MASTER_DATA.ITEM (ITEM_ID, ITEM_CLASS_NM, ITEM_DSC, DELETE_IND)
--- FROM @~/Documents/snowflake/item.csv
--- FILE_FORMAT = (TYPE = CSV, SKIP_HEADER = 1);
---     COPY INTO Y_SIM_BOM.MASTER_DATA.LOCATION (ITEM_ID, ITEM_CLASS_NM, LOCATION_ID)
--- FROM @~/Documents/snowflake/location.csv
--- FILE_FORMAT = (TYPE = CSV, SKIP_HEADER = 1);
---     COPY INTO Y_SIM_BOM.MASTER_DATA.ORIG_BOM (INPUT_ITEM_ID, ITEM_CLASS_NM, OUTPUT_ITEM_ID, LOC)
--- FROM @~/Documents/snowflake/orig_bom.csv
--- FILE_FORMAT = (TYPE = CSV, SKIP_HEADER = 1);
---     RETURN 'Data loaded successfully.';
--- END;
--- $$;
 CREATE 
 OR REPLACE PROCEDURE Y_SIM_BOM.BMATHUB_BASE.P_MASTER_ROOT_MAINTAIN() 
 RETURNS VARCHAR
 AS 
 $$
 BEGIN 
+PUT file:///home/ubuntu/Documents/snowflake/item.csv @y_sim_bom.master_data.sim_bom;
+PUT file:///home/ubuntu/Documents/snowflake/location.csv @y_sim_bom.master_data.sim_bom;
+PUT file:///home/ubuntu/Documents/snowflake/orig_bom.csv @y_sim_bom.master_data.sim_bom;
+COPY INTO Y_SIM_BOM.MASTER_DATA.ITEM
+FROM @y_sim_bom.master_data.sim_bom/item.csv.gz
+FILE_FORMAT = (TYPE = CSV FIELD_OPTIONALLY_ENCLOSED_BY = '"' SKIP_HEADER = 1 COMPRESSION = 'gzip');
+COPY INTO Y_SIM_BOM.MASTER_DATA.LOCATION
+FROM @y_sim_bom.master_data.sim_bom/location.csv.gz
+FILE_FORMAT = (TYPE = CSV FIELD_OPTIONALLY_ENCLOSED_BY = '"' SKIP_HEADER = 1 COMPRESSION = 'gzip');
+COPY INTO Y_SIM_BOM.MASTER_DATA.ORIG_BOM
+FROM @y_sim_bom.master_data.sim_bom/orig_bom.csv.gz
+FILE_FORMAT = (TYPE = CSV FIELD_OPTIONALLY_ENCLOSED_BY = '"' SKIP_HEADER = 1 COMPRESSION = 'gzip');
 MERGE INTO Y_SIM_BOM.BMATHUB_BASE.T_ITEM_DETAIL_ROOT AS target 
   USING (
     SELECT 
